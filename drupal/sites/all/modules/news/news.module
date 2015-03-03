@@ -1,0 +1,73 @@
+<?php
+
+
+function news_menu() {
+  $items['admin/news'] = array(
+    'title' => 'News Data Collection',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('news_form'),
+    'access callback' => TRUE,
+    );
+  return $items;
+}
+
+ 
+
+
+function news_form($form,&$form_submit) {
+ $form['#attributes']['enctype'] = 'multipart/form-data';
+  $form['firstname'] = array(
+    '#title' => t('Firstname'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+  $form['lastname'] = array(
+    '#title' => t('Lastname'),
+    '#type' => 'textfield',
+  );
+   $form['contact_no'] = array(
+    '#title' => t('Contact No'),
+    '#type' => 'textfield',
+    '#required' => TRUE,
+  );
+
+$result = db_select('qulification', 't_alias')->fields('t_alias', array('id', 'qulification'))->execute()->fetchAll();
+$options = array();
+foreach ($result as $value) {
+  $options[$value->id] = $value->qulification;
+}
+
+$form['qulification'] = array(
+  '#type' => 'select',
+  '#title' => 'Qulification',
+  '#options' => $options,
+);
+$form['image_example_image_fid'] = array(
+  '#title' => t('Image'),
+  '#type' => 'managed_file',
+  '#description' => t('The uploaded image will be displayed on this page using the image style choosen below.'),
+  '#default_value' => variable_get('image_example_image_fid', ''),
+  '#upload_location' => 'public://image_example_images/',
+);
+  $form['submit'] = array(
+    '#value' => 'Submit',
+    '#type' => 'submit',
+    );
+  return $form;
+}
+
+function news_form_submit($form, &$form_state) {
+
+
+ $firstname     = $form_state['values']['firstname'];
+ $lastname      = $form_state['values']['lastname'];
+ $contact_no    = $form_state['values']['contact_no'];
+ $qulification  = $form_state['values']['qulification'];
+ $image_example_image_fid  = $form_state['values']['image_example_image_fid'];
+
+
+ db_insert('bingo')->fields(array('firstname' => $firstname,'lastname'=>$lastname,'contact_no'=>$contact_no,'qulification'=>$qulification,'img' =>$image_example_image_fid))->execute();
+ drupal_set_message(t('Welcome to form submit by '.$firstname.' '.$lastname ));
+// $form_state['redirect'] = 'newss';
+
+}

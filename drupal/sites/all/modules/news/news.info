@@ -1,0 +1,4 @@
+name = news
+description = News Module
+core = 7.x
+package = News

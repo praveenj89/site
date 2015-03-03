@@ -1,0 +1,4 @@
+name = slide
+description = slide Module
+core = 7.x
+package = News
