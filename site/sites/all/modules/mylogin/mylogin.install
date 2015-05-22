@@ -1,7 +1,10 @@
 <?php
+/**
+  * Implement hook_schema()
+  */
 function mylogin_schema() {
   $schema = array();
-  $schema['mylogin'] = array (
+  $schema['mylogin'] = array(
     'description' => t('Mylogin module table'),
     'fields' => array(
       'id' => array(
@@ -10,7 +13,7 @@ function mylogin_schema() {
 		'unsigned' => TRUE,
         'not null' => TRUE
     ),
-      'login_destination' => array (
+      'login_destination' => array(
         'description' => t('A field to hold a login destination url'),
         'type' => 'text'
       ),
