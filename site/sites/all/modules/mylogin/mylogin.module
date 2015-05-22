@@ -1,0 +1,106 @@
+<?php
+/**
+ * @file
+ * All functionality of mylogin module.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+ function mylogin_menu() {
+		  $menu['admin/mylogin/manage'] = array
+		  (
+			'title' => 'My login',
+			'page callback' => 'mylogin_manage_item_page',
+			'access callback' => TRUE,
+		  );
+ return $menu;
+}
+
+function mylogin_manage_item_page()
+{
+    return drupal_get_form('mylogin_form');
+}
+
+
+function mylogin_form($form, &$form_state)
+{
+  $rowCount = db_query('SELECT `id`, `login_destination`  FROM {mylogin} WHERE `id` = 1')->rowCount();
+  $result = db_query('SELECT id, login_destination  FROM {mylogin} WHERE id = 1')->fetchObject();
+ 
+if($rowCount!=0){
+	$form['#attributes']['enctype'] = 'multipart/form-data';
+	  $form['id'] = array
+	  (
+		'#type' => 'hidden',
+		'#default_value' => $result->id,
+	  );
+	  $form['login_destination'] = array
+	  (
+		'#title' => t('Enter a Login Destination'),
+		'#type' => 'textfield',
+		'#default_value' => $result->login_destination,
+		'#description' => t('Please enter the login destination after login success. example "dashboard"'),
+	  );
+	  $form['mode'] = array
+	  (
+		'#type' => 'hidden',
+		'#default_value' => 'update',
+	  );
+	  $form['submit'] = array
+  (
+    '#type' => 'submit',
+    '#value' => t('Update'),
+  );
+  }else{
+	$form['id'] = array
+	  (
+		'#type' => 'hidden',
+		'#default_value' => '1',
+	  );
+	   $form['login_destination'] = array
+	  (
+		'#title' => t('Enter a Login Destination'),
+		'#type' => 'textfield',
+		'#default_value' => '',
+		'#description' => t('Please enter the login destination after login success. example "dashboard"'),
+	  );
+	    $form['mode'] = array
+	  (
+		'#type' => 'hidden',
+		'#default_value' => 'save',
+	  );
+	  $form['submit'] = array
+  (
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  } 
+  
+  return $form;
+}
+
+function mylogin_form_submit($form, &$form_state)
+{
+	if($form_state['values']['mode']!='save'){		
+		db_update('mylogin')
+		->fields(array('login_destination' => $form_state['values']['login_destination']))
+		->condition('id', $form_state['values']['id'])
+		->execute();
+		$form_state['redirect'] = 'admin/mylogin/manage';
+	}else{
+		$query = db_insert('mylogin')
+		->fields(array('id' => '1', 'login_destination' => $form_state['values']['login_destination']))    
+		->execute();   
+		 $form_state['redirect'] = 'admin/mylogin/manage';
+	}
+}
+
+
+ function mylogin_user_login(&$edit, $account) {  
+	  $result = db_query('SELECT id, login_destination  FROM {mylogin} WHERE id = 1')->fetchObject();
+	  if(count($result)==1){
+		drupal_goto($result->login_destination);
+		}
+}
+ 
